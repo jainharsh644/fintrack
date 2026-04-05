@@ -964,20 +964,25 @@ function getMonthLabel() {
 }
 function getMonthTransactions() {
   return state.transactions.filter(t => {
-    const d = new Date(t.date); return d.getMonth() === state.currentMonth && d.getFullYear() === state.currentYear;
+    const d = parseDate(t.date); return d.month === state.currentMonth && d.year === state.currentYear;
   });
 }
 
 // ===== FIXED BILLS (manual pay + lock) =====
+// Parse date safely to avoid timezone issues (YYYY-MM-DD → local date)
+function parseDate(ds) { const [y,m,d] = ds.split('-').map(Number); return { month: m-1, year: y, day: d }; }
+
 function isFixedPaid(billId) {
   const m = state.currentMonth, y = state.currentYear;
-  return state.transactions.some(t =>
-    t.fixedId === billId && t.isFixed && new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y
-  );
+  return state.transactions.some(t => {
+    if (t.fixedId !== billId || !t.isFixed) return false;
+    const d = parseDate(t.date);
+    return d.month === m && d.year === y;
+  });
 }
 
 function payFixedBill(billId) {
-  if (isFixedPaid(billId)) return; // already paid & locked
+  if (isFixedPaid(billId)) return;
   const bill = state.fixedBills.find(b => b.id === billId);
   if (!bill) return;
   const m = state.currentMonth, y = state.currentYear;
@@ -997,9 +1002,11 @@ function unlockFixedBill(e, billId) {
   e.stopPropagation();
   if (!confirm('Undo this payment? It will be removed from expenses.')) return;
   const m = state.currentMonth, y = state.currentYear;
-  state.transactions = state.transactions.filter(t =>
-    !(t.fixedId === billId && t.isFixed && new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y)
-  );
+  state.transactions = state.transactions.filter(t => {
+    if (t.fixedId !== billId || !t.isFixed) return true;
+    const d = parseDate(t.date);
+    return !(d.month === m && d.year === y);
+  });
   saveData();
   render();
   showToast('Payment undone');
@@ -1008,9 +1015,11 @@ function unlockFixedBill(e, billId) {
 // ===== PAYCHECKS (tap to receive + lock) =====
 function isPaycheckReceived(paycheckId) {
   const m = state.currentMonth, y = state.currentYear;
-  return state.transactions.some(t =>
-    t.paycheckId === paycheckId && t.isPaycheck && new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y
-  );
+  return state.transactions.some(t => {
+    if (t.paycheckId !== paycheckId || !t.isPaycheck) return false;
+    const d = parseDate(t.date);
+    return d.month === m && d.year === y;
+  });
 }
 
 function receivePaycheck(paycheckId) {
@@ -1393,13 +1402,10 @@ function renderSettingsFixed() {
 }
 function editFixedBill(i) {
   const b = state.fixedBills[i];
-  const name = prompt('Bill name:', b.name);
-  if (!name) return;
-  const amount = prompt('Monthly amount ($):', b.amount);
+  const amount = prompt(`${b.name} — Monthly amount ($):`, b.amount);
   if (!amount || isNaN(amount)) return;
-  b.name = name;
   b.amount = +amount;
-  saveData(); renderSettingsFixed(); render(); showToast(name + ' updated');
+  saveData(); renderSettingsFixed(); render(); showToast(b.name + ' updated to ' + fmt(+amount));
 }
 function removeFixedBill(i) {
   if (!confirm('Remove ' + state.fixedBills[i].name + '?')) return;
