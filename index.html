@@ -448,6 +448,36 @@
   .goal-section { margin-bottom: 20px; }
   .goal-section h3 { font-size: 14px; margin-bottom: 10px; color: var(--text-dim); display: flex; justify-content: space-between; }
 
+  .fulfill-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+  }
+  .fulfill-item .fl-icon { font-size: 22px; }
+  .fulfill-item .fl-info { flex: 1; }
+  .fulfill-item .fl-type { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .fulfill-item .fl-type.debt { color: var(--red); }
+  .fulfill-item .fl-type.gold { color: var(--orange); }
+  .fulfill-item .fl-note { font-size: 13px; margin-top: 2px; }
+  .fulfill-item .fl-date { font-size: 11px; color: var(--text-dim); }
+  .fulfill-item .fl-amount { font-size: 15px; font-weight: 700; color: var(--green); }
+  .fulfill-item .fl-del {
+    width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--bg); color: var(--red); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .goal-summary-row {
+    display: flex; gap: 8px; margin-bottom: 12px;
+  }
+  .gs-card {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px; text-align: center;
+  }
+  .gs-card .gs-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .gs-card .gs-value { font-size: 16px; font-weight: 700; }
+  .gs-card .gs-value.debt-color { color: var(--red); }
+  .gs-card .gs-value.gold-color { color: var(--orange); }
+
   .projection-card {
     background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
     padding: 16px; margin-bottom: 10px;
@@ -716,9 +746,19 @@
       <div id="goalMilestones"></div>
     </div>
 
+    <!-- Goal Fulfillment -->
+    <div class="goal-section">
+      <h3>Goal Fulfilled <span id="fulfilledTotal" style="color:var(--green);font-weight:600;"></span></h3>
+      <div id="goalFulfilled"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="submit-btn" style="flex:1;font-size:13px;padding:12px;background:var(--red);margin:0;" onclick="addFulfillment('debt')">+ Debt Payment</button>
+        <button class="submit-btn" style="flex:1;font-size:13px;padding:12px;background:var(--orange);color:#333;margin:0;" onclick="addFulfillment('gold')">+ Gold Purchase</button>
+      </div>
+    </div>
+
     <!-- Assets -->
     <div class="goal-section">
-      <h3>Net Worth Breakdown <span id="goalAssetTotal" style="color:var(--green);font-weight:600;"></span></h3>
+      <h3>Savings Available <span id="goalAssetTotal" style="color:var(--green);font-weight:600;"></span></h3>
       <div id="goalAssets"></div>
     </div>
 
@@ -836,6 +876,7 @@ let state = {
     { id: 'salary_1', name: 'Salary 1 (15th)', amount: 3500, emoji: '💰', day: 15, purpose: 'Savings' },
     { id: 'salary_2', name: 'Salary 2 (30th)', amount: 3500, emoji: '💰', day: 30, purpose: 'Expenses' },
   ],
+  fulfillments: [], // { id, type: 'debt'|'gold', amount, note, date }
   monthlyIncome: 7000,
   goalTarget: 111111,
   goalDeadline: '2027-09-30',
@@ -861,6 +902,7 @@ function loadData() {
       state.startMonth = p.startMonth ?? 4;
       state.startYear = p.startYear ?? 2026;
       state.paychecks = p.paychecks || state.paychecks;
+      state.fulfillments = p.fulfillments || [];
     }
     // Migrate from v2
     const v2 = localStorage.getItem('spendwise_v2');
@@ -881,7 +923,7 @@ function saveData() {
     goalPin: state.goalPin, assets: state.assets, trips: state.trips,
     monthlyIncome: state.monthlyIncome, goalTarget: state.goalTarget,
     goalDeadline: state.goalDeadline, startMonth: state.startMonth, startYear: state.startYear,
-    paychecks: state.paychecks,
+    paychecks: state.paychecks, fulfillments: state.fulfillments,
   }));
 }
 
@@ -1492,13 +1534,21 @@ function calcTotalNetWorth() {
 function renderGoal() {
   const { months, cumulative } = calcCumulativeSavings();
   const totalWorth = state.assets.stocks + state.assets.bank + cumulative;
+
+  // Fulfillment totals
+  const debtTotal = state.fulfillments.filter(f => f.type === 'debt').reduce((s,f) => s + f.amount, 0);
+  const goldTotal = state.fulfillments.filter(f => f.type === 'gold').reduce((s,f) => s + f.amount, 0);
+  const fulfilledTotal = debtTotal + goldTotal;
+
+  // Progress = fulfilled (done) + available savings (ready to use)
   const target = state.goalTarget;
-  const pct = Math.min((totalWorth / target) * 100, 100);
-  const remaining = Math.max(0, target - totalWorth);
+  const totalProgress = fulfilledTotal + totalWorth;
+  const pct = Math.min((totalProgress / target) * 100, 100);
+  const remaining = Math.max(0, target - totalProgress);
 
   // Hero
-  document.getElementById('goalCurrentTotal').textContent = fmtShort(totalWorth);
-  document.getElementById('goalPctText').textContent = `${pct.toFixed(1)}% of ${fmtShort(target)} goal`;
+  document.getElementById('goalCurrentTotal').textContent = fmtShort(totalProgress);
+  document.getElementById('goalPctText').textContent = `${pct.toFixed(1)}% of ${fmtShort(target)} goal (${fmtShort(fulfilledTotal)} done + ${fmtShort(totalWorth)} saved)`;
   document.getElementById('goalBarFill').style.width = pct + '%';
   document.getElementById('goalRemaining').textContent = remaining > 0 ? `${fmtShort(remaining)} to go` : 'Goal reached!';
 
@@ -1520,7 +1570,7 @@ function renderGoal() {
   const dec2026 = 77778; // 70 lakhs
   const dec2026High = 88889; // 80 lakhs
   const sep2027 = target;
-  const dec2026Status = totalWorth >= dec2026 ? 'on-track' : (totalWorth >= dec2026 * 0.7 ? 'at-risk' : 'behind');
+  const dec2026Status = totalProgress >= dec2026 ? 'on-track' : (totalProgress >= dec2026 * 0.7 ? 'at-risk' : 'behind');
   const sep2027Status = pct >= (monthsLeft <= 0 ? 100 : ((18 - monthsLeft) / 18) * 100 * 0.85) ? 'on-track' : 'at-risk';
 
   document.getElementById('goalMilestones').innerHTML = `
@@ -1528,7 +1578,7 @@ function renderGoal() {
       <div class="ms-icon">&#127937;</div>
       <div class="ms-info">
         <div class="ms-name">Dec 2026 — 70-80 Lakhs</div>
-        <div class="ms-detail">${fmtShort(dec2026)} - ${fmtShort(dec2026High)} target · You have ${fmtShort(totalWorth)}</div>
+        <div class="ms-detail">${fmtShort(dec2026)} - ${fmtShort(dec2026High)} target · You're at ${fmtShort(totalProgress)}</div>
       </div>
       <span class="ms-status ${dec2026Status}">${dec2026Status === 'on-track' ? 'On Track' : dec2026Status === 'at-risk' ? 'Tight' : 'Behind'}</span>
     </div>
@@ -1541,6 +1591,35 @@ function renderGoal() {
       <span class="ms-status ${sep2027Status}">${sep2027Status === 'on-track' ? 'On Track' : 'Tight'}</span>
     </div>
   `;
+
+  // Fulfillment section
+  document.getElementById('fulfilledTotal').textContent = fmtShort(fulfilledTotal) + ' done';
+  const fulfillHtml = [];
+  if (debtTotal > 0 || goldTotal > 0) {
+    fulfillHtml.push(`<div class="goal-summary-row">
+      <div class="gs-card"><div class="gs-label">Debt Cleared</div><div class="gs-value debt-color">${fmtShort(debtTotal)}</div></div>
+      <div class="gs-card"><div class="gs-label">Gold Bought</div><div class="gs-value gold-color">${fmtShort(goldTotal)}</div></div>
+      <div class="gs-card"><div class="gs-label">Remaining</div><div class="gs-value">${fmtShort(remaining)}</div></div>
+    </div>`);
+  }
+  const sortedFulfill = [...state.fulfillments].sort((a,b) => new Date(b.date) - new Date(a.date));
+  sortedFulfill.forEach(f => {
+    const d = new Date(f.date).toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+    fulfillHtml.push(`<div class="fulfill-item">
+      <div class="fl-icon">${f.type === 'debt' ? '💸' : '🪙'}</div>
+      <div class="fl-info">
+        <div class="fl-type ${f.type}">${f.type === 'debt' ? 'Debt Payment' : 'Gold Purchase'}</div>
+        <div class="fl-note">${f.note || (f.type === 'debt' ? 'Sent to India' : 'Gold bought')}</div>
+        <div class="fl-date">${d}</div>
+      </div>
+      <div class="fl-amount">${fmtShort(f.amount)}</div>
+      <button class="fl-del" onclick="deleteFulfillment('${f.id}')" title="Delete">✕</button>
+    </div>`);
+  });
+  if (sortedFulfill.length === 0) {
+    fulfillHtml.push('<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:13px;">No payments yet. Add when you clear debt or buy gold.</div>');
+  }
+  document.getElementById('goalFulfilled').innerHTML = fulfillHtml.join('');
 
   // Assets
   const stockProfit = state.assets.stocks - state.assets.stockInvested;
@@ -1578,19 +1657,22 @@ function renderGoal() {
   `).join('');
 
   // Projection
-  const avgMonthlySavings = months.length > 0 ? cumulative / months.length : state.monthlyIncome;
-  const projectedByDeadline = totalWorth + (avgMonthlySavings * monthsLeft);
-  const onTrack = projectedByDeadline >= target;
+  const completedMonths = months.filter(m => !m.isCurrent);
+  const avgMonthlySavings = completedMonths.length > 0 ? cumulative / completedMonths.length : state.monthlyIncome - state.budget;
+  const projectedSavings = totalWorth + (avgMonthlySavings * monthsLeft);
+  const projectedTotal = fulfilledTotal + projectedSavings - (totalTravelBudget - totalTravelSpent);
+  const onTrack = projectedTotal >= target;
   document.getElementById('goalProjection').innerHTML = `
-    <div class="proj-row"><span class="pr-label">Current Net Worth</span><span class="pr-value">${fmtShort(totalWorth)}</span></div>
+    <div class="proj-row"><span class="pr-label">Already Fulfilled (debt + gold)</span><span class="pr-value" style="color:var(--green);">${fmtShort(fulfilledTotal)}</span></div>
+    <div class="proj-row"><span class="pr-label">Current Savings Available</span><span class="pr-value">${fmtShort(totalWorth)}</span></div>
     <div class="proj-row"><span class="pr-label">Avg Monthly Savings</span><span class="pr-value">${fmtShort(avgMonthlySavings)}</span></div>
     <div class="proj-row"><span class="pr-label">Months Remaining</span><span class="pr-value">${monthsLeft}</span></div>
-    <div class="proj-row"><span class="pr-label">Travel Deduction</span><span class="pr-value" style="color:var(--red);">-${fmtShort(totalTravelBudget - totalTravelSpent)}</span></div>
+    <div class="proj-row"><span class="pr-label">Travel Remaining</span><span class="pr-value" style="color:var(--red);">-${fmtShort(totalTravelBudget - totalTravelSpent)}</span></div>
     <div class="proj-row highlight">
       <span class="pr-label">Projected by Sep 2027</span>
-      <span class="pr-value" style="color:${onTrack ? 'var(--green)' : 'var(--red)'};">${fmtShort(projectedByDeadline - (totalTravelBudget - totalTravelSpent))} ${onTrack ? '&#10003;' : '&#9888;'}</span>
+      <span class="pr-value" style="color:${onTrack ? 'var(--green)' : 'var(--red)'};">${fmtShort(projectedTotal)} ${onTrack ? '&#10003;' : '&#9888;'}</span>
     </div>
-    <div style="font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center;">${onTrack ? 'You\'re on track! Keep it up.' : 'You need to save more or cut travel to hit the goal.'}</div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center;">${onTrack ? 'You\'re on track! Keep it up.' : 'Need to save more or cut expenses to hit the goal.'}</div>
   `;
 
   // Monthly savings log
@@ -1603,6 +1685,33 @@ function renderGoal() {
         <div style="text-align:right;"><div style="font-size:11px;color:var(--text-dim);">Spent</div><div style="font-size:13px;color:var(--red);">${fmtShort(m.expenses)}</div></div>
       </div>
     `).join('');
+}
+
+function addFulfillment(type) {
+  const label = type === 'debt' ? 'Debt Payment' : 'Gold Purchase';
+  const amount = prompt(`${label} — Amount ($):`);
+  if (!amount || isNaN(amount) || +amount <= 0) return;
+  const note = prompt(`Note (e.g. "${type === 'debt' ? 'Sent to family via Wise' : 'Gold chain for mom'}"):`) || '';
+  state.fulfillments.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    type,
+    amount: +amount,
+    note,
+    date: new Date().toISOString().split('T')[0],
+  });
+  saveData();
+  renderGoal();
+  showToast(`${type === 'debt' ? '💸' : '🪙'} ${fmtShort(+amount)} ${label.toLowerCase()} recorded!`);
+}
+
+function deleteFulfillment(id) {
+  const f = state.fulfillments.find(x => x.id === id);
+  if (!f) return;
+  if (!confirm(`Delete this ${f.type === 'debt' ? 'debt payment' : 'gold purchase'} of ${fmtShort(f.amount)}?`)) return;
+  state.fulfillments = state.fulfillments.filter(x => x.id !== id);
+  saveData();
+  renderGoal();
+  showToast('Entry removed');
 }
 
 function editAsset(type) {
