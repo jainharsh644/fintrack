@@ -1104,11 +1104,11 @@ function render() {
   balEl.textContent = (balance >= 0 ? '' : '-') + fmtShort(balance);
   balEl.className = 'value ' + (balance >= 0 ? 'green' : 'red');
 
-  // Savings: 1st paycheck + leftover from expense paycheck (dynamic from paychecks)
-  const expensePaycheck = state.paychecks[1] ? state.paychecks[1].amount : 3057;
-  const savingsFromPaycheck = state.paychecks[0] ? state.paychecks[0].amount : 3022;
-  const leftover = Math.max(0, expensePaycheck - expense);
-  const totalSavings = savingsFromPaycheck + leftover;
+  // Savings: salary 1 (savings) + leftover from expense paycheck (salary 2)
+  const salary1 = state.paychecks[0] ? state.paychecks[0].amount : 3022;
+  const salary2 = state.paychecks[1] ? state.paychecks[1].amount : 3057;
+  const leftover = Math.max(0, salary2 - expense);
+  const totalSavings = salary1 + leftover;
   document.getElementById('savingsAmount').textContent = fmtShort(totalSavings);
   const sPct = Math.min((totalSavings / state.savingsGoal) * 100, 100);
   document.getElementById('savingsFill').style.width = sPct + '%';
@@ -1119,16 +1119,15 @@ function render() {
   renderPaychecks(txs);
   renderFixedBills(txs);
 
-  // Budget = variable spending only (total budget - fixed bills that are paid)
+  // Budget: total budget - only PAID fixed bills = remaining for variable spending
   const paidFixedTotal = txs.filter(t => t.isFixed).reduce((s,t) => s + t.amount, 0);
-  const fixedBillsTotal = state.fixedBills.reduce((s,b) => s + b.amount, 0);
-  const variableBudget = state.budget - fixedBillsTotal;
+  const variableBudget = state.budget - paidFixedTotal;
   const variableSpent = txs.filter(t => t.type === 'expense' && !t.isFixed).reduce((s,t) => s + t.amount, 0);
   const pct = variableBudget > 0 ? Math.min((variableSpent / variableBudget) * 100, 100) : 0;
   const fill = document.getElementById('budgetFill');
   fill.style.width = pct + '%';
   fill.style.background = pct > 90 ? 'var(--red)' : pct > 70 ? 'var(--orange)' : 'var(--green)';
-  document.getElementById('budgetSpent').textContent = fmt(variableSpent) + ' spent';
+  document.getElementById('budgetSpent').textContent = fmt(variableSpent) + ' of ' + fmt(variableBudget);
   const left = variableBudget - variableSpent;
   document.getElementById('budgetLeft').textContent = (left >= 0 ? fmt(left) + ' left' : fmt(-left) + ' over!');
 
