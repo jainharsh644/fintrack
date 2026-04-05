@@ -1384,9 +1384,22 @@ function renderSettingsFixed() {
   document.getElementById('settingsFixedList').innerHTML = state.fixedBills.map((b, i) =>
     `<div class="settings-row">
       <span>${b.emoji} ${b.name} — ${fmt(b.amount)}</span>
-      <button class="icon-btn" onclick="removeFixedBill(${i})" style="width:auto;padding:0 10px;font-size:13px;color:var(--red);border-color:var(--red);">✕</button>
+      <div style="display:flex;gap:6px;">
+        <button class="icon-btn" onclick="editFixedBill(${i})" style="width:auto;padding:0 10px;font-size:13px;color:var(--accent-light);border-color:var(--accent);">Edit</button>
+        <button class="icon-btn" onclick="removeFixedBill(${i})" style="width:auto;padding:0 10px;font-size:13px;color:var(--red);border-color:var(--red);">✕</button>
+      </div>
     </div>`
   ).join('');
+}
+function editFixedBill(i) {
+  const b = state.fixedBills[i];
+  const name = prompt('Bill name:', b.name);
+  if (!name) return;
+  const amount = prompt('Monthly amount ($):', b.amount);
+  if (!amount || isNaN(amount)) return;
+  b.name = name;
+  b.amount = +amount;
+  saveData(); renderSettingsFixed(); render(); showToast(name + ' updated');
 }
 function removeFixedBill(i) {
   if (!confirm('Remove ' + state.fixedBills[i].name + '?')) return;
