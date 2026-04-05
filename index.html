@@ -341,11 +341,124 @@
 
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
 
+  /* ===== GOAL PAGE ===== */
+  .pin-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 60vh; padding: 40px 20px;
+  }
+  .pin-screen .lock-icon { font-size: 48px; margin-bottom: 16px; }
+  .pin-screen h2 { font-size: 18px; margin-bottom: 6px; }
+  .pin-screen p { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; text-align: center; }
+  .pin-dots { display: flex; gap: 12px; margin-bottom: 24px; }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border);
+    transition: all .2s;
+  }
+  .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+  .pin-dot.error { border-color: var(--red); background: var(--red); }
+  .pin-keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; max-width: 260px; }
+  .pin-key {
+    width: 72px; height: 56px; border-radius: 14px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text); font-size: 22px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .pin-key:active { background: var(--accent); border-color: var(--accent); transform: scale(.93); }
+  .pin-key.del { font-size: 16px; color: var(--text-dim); }
+
+  .goal-content { padding: 0 20px 20px; }
+
+  /* Big goal card */
+  .goal-hero {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    border-radius: var(--radius); padding: 24px 20px; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+  }
+  .goal-hero::after {
+    content: ''; position: absolute; right: -30px; bottom: -30px;
+    width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.08);
+  }
+  .goal-hero .gh-label { font-size: 12px; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: 1px; }
+  .goal-hero .gh-amount { font-size: 36px; font-weight: 800; color: #fff; margin: 6px 0; }
+  .goal-hero .gh-target { font-size: 13px; color: rgba(255,255,255,.7); }
+  .goal-hero .gh-bar-bg { height: 8px; background: rgba(0,0,0,.2); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+  .goal-hero .gh-bar-fill { height: 100%; background: #fff; border-radius: 4px; transition: width .5s; }
+  .goal-hero .gh-row { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.7); }
+
+  .goal-countdown {
+    display: flex; gap: 10px; margin-bottom: 16px;
+  }
+  .gc-item {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px; text-align: center;
+  }
+  .gc-item .gc-num { font-size: 22px; font-weight: 700; color: var(--accent-light); }
+  .gc-item .gc-label { font-size: 10px; color: var(--text-dim); margin-top: 2px; text-transform: uppercase; }
+
+  /* Asset cards */
+  .asset-section h3 { font-size: 14px; margin-bottom: 10px; color: var(--text-dim); }
+  .asset-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .asset-card .ac-left { display: flex; align-items: center; gap: 12px; }
+  .asset-card .ac-icon { font-size: 24px; }
+  .asset-card .ac-name { font-size: 13px; color: var(--text-dim); }
+  .asset-card .ac-val { font-size: 16px; font-weight: 700; }
+  .asset-card .ac-edit {
+    padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--accent-light); font-size: 12px; cursor: pointer;
+  }
+  .asset-card .ac-auto { font-size: 10px; color: var(--green); background: rgba(0,184,148,.12); padding: 2px 8px; border-radius: 6px; }
+
+  /* Milestone */
+  .milestone-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .milestone-card .ms-icon { font-size: 24px; }
+  .milestone-card .ms-info { flex: 1; }
+  .milestone-card .ms-name { font-size: 14px; font-weight: 600; }
+  .milestone-card .ms-detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .milestone-card .ms-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; }
+  .ms-status.on-track { background: rgba(0,184,148,.12); color: var(--green); }
+  .ms-status.at-risk { background: rgba(253,203,110,.12); color: var(--orange); }
+  .ms-status.behind { background: rgba(255,107,107,.12); color: var(--red); }
+
+  /* Trip cards */
+  .trip-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .trip-card .tr-icon { font-size: 22px; }
+  .trip-card .tr-info { flex: 1; }
+  .trip-card .tr-name { font-size: 14px; font-weight: 500; }
+  .trip-card .tr-budget { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .trip-card .tr-spent { font-size: 14px; font-weight: 600; text-align: right; }
+
+  .goal-section { margin-bottom: 20px; }
+  .goal-section h3 { font-size: 14px; margin-bottom: 10px; color: var(--text-dim); display: flex; justify-content: space-between; }
+
+  .projection-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px; margin-bottom: 10px;
+  }
+  .proj-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .proj-row .pr-label { color: var(--text-dim); }
+  .proj-row .pr-value { font-weight: 600; }
+  .proj-row.highlight { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 10px; }
+  .proj-row.highlight .pr-value { color: var(--green); font-size: 15px; }
+
   @media (max-width: 380px) {
     .summary { gap: 6px; }
     .stat-card .value { font-size: 15px; }
     .amount-display .big-amount { font-size: 40px; }
     .fixed-grid { grid-template-columns: 1fr; }
+    .goal-hero .gh-amount { font-size: 28px; }
+    .pin-key { width: 62px; height: 50px; }
   }
 </style>
 </head>
@@ -545,6 +658,87 @@
   </div>
 </div>
 
+<!-- ============ GOAL PAGE (PIN PROTECTED) ============ -->
+<div class="page" id="page-goal">
+  <div class="add-page-header">
+    <button class="back-btn" onclick="showPage('home')">&#8249;</button>
+    <h2>My Goal</h2>
+    <button class="back-btn" style="font-size:14px;" onclick="lockGoal()">&#128274;</button>
+  </div>
+
+  <!-- PIN Screen -->
+  <div id="goalPinScreen" class="pin-screen">
+    <div class="lock-icon">&#128274;</div>
+    <h2 id="pinTitle">Enter PIN</h2>
+    <p id="pinSubtext">Enter your 4-digit PIN to access your financial goals</p>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinInput(1)">1</button>
+      <button class="pin-key" onclick="pinInput(2)">2</button>
+      <button class="pin-key" onclick="pinInput(3)">3</button>
+      <button class="pin-key" onclick="pinInput(4)">4</button>
+      <button class="pin-key" onclick="pinInput(5)">5</button>
+      <button class="pin-key" onclick="pinInput(6)">6</button>
+      <button class="pin-key" onclick="pinInput(7)">7</button>
+      <button class="pin-key" onclick="pinInput(8)">8</button>
+      <button class="pin-key" onclick="pinInput(9)">9</button>
+      <button class="pin-key" style="visibility:hidden;"></button>
+      <button class="pin-key" onclick="pinInput(0)">0</button>
+      <button class="pin-key del" onclick="pinDelete()">&#9003;</button>
+    </div>
+  </div>
+
+  <!-- Goal Content (hidden until PIN) -->
+  <div id="goalContent" class="goal-content" style="display:none;">
+    <!-- Hero -->
+    <div class="goal-hero">
+      <div class="gh-label">Target: 1 Crore INR ($111,111)</div>
+      <div class="gh-amount" id="goalCurrentTotal">$0</div>
+      <div class="gh-target" id="goalPctText">0% of goal</div>
+      <div class="gh-bar-bg"><div class="gh-bar-fill" id="goalBarFill"></div></div>
+      <div class="gh-row">
+        <span id="goalRemaining">$111,111 to go</span>
+        <span>by Sep 2027</span>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="goal-countdown" id="goalCountdown"></div>
+
+    <!-- Milestones -->
+    <div class="goal-section">
+      <h3>Milestones</h3>
+      <div id="goalMilestones"></div>
+    </div>
+
+    <!-- Assets -->
+    <div class="goal-section">
+      <h3>Net Worth Breakdown <span id="goalAssetTotal" style="color:var(--green);font-weight:600;"></span></h3>
+      <div id="goalAssets"></div>
+    </div>
+
+    <!-- Travel Fund -->
+    <div class="goal-section">
+      <h3>Travel Fund <span id="travelFundStatus" style="font-weight:600;"></span></h3>
+      <div id="goalTrips"></div>
+    </div>
+
+    <!-- Projection -->
+    <div class="goal-section">
+      <h3>Projection</h3>
+      <div class="projection-card" id="goalProjection"></div>
+    </div>
+
+    <!-- Monthly Savings Log -->
+    <div class="goal-section">
+      <h3>Monthly Savings Log</h3>
+      <div id="goalSavingsLog"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Modal -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
@@ -568,7 +762,7 @@
   <button class="nav-item" id="nav-transactions" onclick="showPage('transactions')"><span class="nav-icon">&#9776;</span>History</button>
   <button class="nav-item-add" onclick="showPage('add')"><div class="add-circle">+</div></button>
   <button class="nav-item" id="nav-insights" onclick="showPage('insights')"><span class="nav-icon">&#9733;</span>Insights</button>
-  <button class="nav-item" id="nav-settings" onclick="showPage('settings')"><span class="nav-icon">&#9881;</span>Settings</button>
+  <button class="nav-item" id="nav-goal" onclick="showPage('goal')"><span class="nav-icon">&#127919;</span>Goal</button>
 </div>
 
 <script>
@@ -612,8 +806,8 @@ const DEFAULT_FIXED = [
 
 let state = {
   transactions: [],
-  budget: 3000,         // total from expense paycheck
-  savingsGoal: 4000,    // $3500 paycheck + $500 leftover
+  budget: 3000,
+  savingsGoal: 4000,
   fixedBills: [...DEFAULT_FIXED],
   currentMonth: new Date().getMonth(),
   currentYear: new Date().getFullYear(),
@@ -621,26 +815,62 @@ let state = {
   selectedCategory: null,
   dateMode: 'today',
   txFilter: 'all',
+  // Goal data
+  goalPin: null,
+  goalUnlocked: false,
+  assets: {
+    stocks: 27000,
+    bank: 11000,
+    stockInvested: 27000,
+  },
+  trips: [
+    { id: 'india', name: 'India Trip', emoji: '🇮🇳', budget: 4500, spent: 0 },
+    { id: 'arizona', name: 'Arizona', emoji: '🏜️', budget: 700, spent: 0 },
+    { id: 'chicago', name: 'Chicago', emoji: '🏙️', budget: 700, spent: 0 },
+    { id: 'fourth', name: 'CA / NY', emoji: '🌉', budget: 900, spent: 0 },
+  ],
+  monthlyIncome: 7000,
+  goalTarget: 111111,
+  goalDeadline: '2027-09-30',
 };
 
 let pieChart, barChart, lineChart;
 
 function loadData() {
   try {
-    const d = localStorage.getItem('spendwise_v2');
+    const d = localStorage.getItem('spendwise_v3');
     if (d) {
       const p = JSON.parse(d);
       state.transactions = p.transactions || [];
       state.budget = p.budget ?? 3000;
       state.savingsGoal = p.savingsGoal ?? 4000;
       state.fixedBills = p.fixedBills || [...DEFAULT_FIXED];
+      state.goalPin = p.goalPin || null;
+      state.assets = p.assets || state.assets;
+      state.trips = p.trips || state.trips;
+      state.monthlyIncome = p.monthlyIncome ?? 7000;
+      state.goalTarget = p.goalTarget ?? 111111;
+      state.goalDeadline = p.goalDeadline || '2027-09-30';
+    }
+    // Migrate from v2
+    const v2 = localStorage.getItem('spendwise_v2');
+    if (v2 && !d) {
+      const p = JSON.parse(v2);
+      state.transactions = p.transactions || [];
+      state.budget = p.budget ?? 3000;
+      state.savingsGoal = p.savingsGoal ?? 4000;
+      state.fixedBills = p.fixedBills || [...DEFAULT_FIXED];
+      saveData();
     }
   } catch(e) {}
 }
 function saveData() {
-  localStorage.setItem('spendwise_v2', JSON.stringify({
+  localStorage.setItem('spendwise_v3', JSON.stringify({
     transactions: state.transactions, budget: state.budget,
     savingsGoal: state.savingsGoal, fixedBills: state.fixedBills,
+    goalPin: state.goalPin, assets: state.assets, trips: state.trips,
+    monthlyIncome: state.monthlyIncome, goalTarget: state.goalTarget,
+    goalDeadline: state.goalDeadline,
   }));
 }
 
@@ -659,6 +889,7 @@ function showPage(page) {
   if (page === 'insights') renderInsights(getMonthTransactions());
   if (page === 'home') render();
   if (page === 'settings') renderSettingsFixed();
+  if (page === 'goal') showGoalPage();
 }
 
 // ===== MONTH =====
@@ -1069,7 +1300,7 @@ function addFixedBill() {
 }
 
 function exportData() {
-  const blob = new Blob([JSON.stringify({transactions:state.transactions,budget:state.budget,savingsGoal:state.savingsGoal,fixedBills:state.fixedBills},null,2)],{type:'application/json'});
+  const blob = new Blob([JSON.stringify({transactions:state.transactions,budget:state.budget,savingsGoal:state.savingsGoal,fixedBills:state.fixedBills,assets:state.assets,trips:state.trips,goalTarget:state.goalTarget,goalDeadline:state.goalDeadline,monthlyIncome:state.monthlyIncome},null,2)],{type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = `spendwise-${new Date().toISOString().slice(0,10)}.json`; a.click(); showToast('Exported!');
 }
@@ -1089,6 +1320,246 @@ function clearAllData() {
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
 document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if(e.target===o) closeModal(o.id); }); });
+
+// ===== GOAL PAGE =====
+let pinBuffer = '';
+let pinMode = 'check'; // 'set' or 'check'
+
+function showGoalPage() {
+  if (!state.goalPin) {
+    pinMode = 'set';
+    document.getElementById('pinTitle').textContent = 'Set Your PIN';
+    document.getElementById('pinSubtext').textContent = 'Create a 4-digit PIN to protect your financial goals';
+  } else if (!state.goalUnlocked) {
+    pinMode = 'check';
+    document.getElementById('pinTitle').textContent = 'Enter PIN';
+    document.getElementById('pinSubtext').textContent = 'Enter your 4-digit PIN to access your goals';
+  }
+  if (state.goalUnlocked) {
+    document.getElementById('goalPinScreen').style.display = 'none';
+    document.getElementById('goalContent').style.display = 'block';
+    renderGoal();
+  } else {
+    document.getElementById('goalPinScreen').style.display = 'flex';
+    document.getElementById('goalContent').style.display = 'none';
+    pinBuffer = '';
+    updatePinDots();
+  }
+}
+
+function pinInput(n) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += n;
+  updatePinDots();
+  if (pinBuffer.length === 4) {
+    setTimeout(() => {
+      if (pinMode === 'set') {
+        state.goalPin = pinBuffer;
+        state.goalUnlocked = true;
+        saveData();
+        showGoalPage();
+        showToast('PIN set! Remember it.');
+      } else {
+        if (pinBuffer === state.goalPin) {
+          state.goalUnlocked = true;
+          showGoalPage();
+        } else {
+          const dots = document.querySelectorAll('#pinDots .pin-dot');
+          dots.forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
+          setTimeout(() => { pinBuffer = ''; updatePinDots(); dots.forEach(d => d.classList.remove('error')); }, 600);
+          showToast('Wrong PIN');
+        }
+      }
+    }, 200);
+  }
+}
+
+function pinDelete() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+}
+
+function updatePinDots() {
+  const dots = document.querySelectorAll('#pinDots .pin-dot');
+  dots.forEach((d, i) => { d.classList.toggle('filled', i < pinBuffer.length); });
+}
+
+function lockGoal() {
+  state.goalUnlocked = false;
+  showGoalPage();
+}
+
+// ===== GOAL CALCULATIONS =====
+function calcCumulativeSavings() {
+  // For each month from the earliest transaction to now, calculate savings
+  // Savings per month = monthlyIncome - expenses
+  const now = new Date();
+  const months = [];
+  let earliest = new Date();
+  state.transactions.forEach(t => { const d = new Date(t.date); if (d < earliest) earliest = d; });
+
+  let m = earliest.getMonth(), y = earliest.getFullYear();
+  let cumulative = 0;
+
+  while (y < now.getFullYear() || (y === now.getFullYear() && m <= now.getMonth())) {
+    const monthTxs = state.transactions.filter(t => {
+      const d = new Date(t.date); return d.getMonth() === m && d.getFullYear() === y;
+    });
+    const expenses = monthTxs.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
+    const monthSavings = Math.max(0, state.monthlyIncome - expenses);
+    cumulative += monthSavings;
+    const label = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    months.push({ month: m, year: y, label, expenses, savings: monthSavings, cumulative });
+    m++;
+    if (m > 11) { m = 0; y++; }
+  }
+
+  // If no transactions yet, at least show current month
+  if (months.length === 0) {
+    months.push({ month: now.getMonth(), year: now.getFullYear(), label: 'Now', expenses: 0, savings: state.monthlyIncome, cumulative: state.monthlyIncome });
+    cumulative = state.monthlyIncome;
+  }
+
+  return { months, cumulative };
+}
+
+function calcTotalNetWorth() {
+  const { cumulative } = calcCumulativeSavings();
+  return state.assets.stocks + state.assets.bank + cumulative;
+}
+
+function renderGoal() {
+  const { months, cumulative } = calcCumulativeSavings();
+  const totalWorth = state.assets.stocks + state.assets.bank + cumulative;
+  const target = state.goalTarget;
+  const pct = Math.min((totalWorth / target) * 100, 100);
+  const remaining = Math.max(0, target - totalWorth);
+
+  // Hero
+  document.getElementById('goalCurrentTotal').textContent = fmtShort(totalWorth);
+  document.getElementById('goalPctText').textContent = `${pct.toFixed(1)}% of ${fmtShort(target)} goal`;
+  document.getElementById('goalBarFill').style.width = pct + '%';
+  document.getElementById('goalRemaining').textContent = remaining > 0 ? `${fmtShort(remaining)} to go` : 'Goal reached!';
+
+  // Countdown
+  const now = new Date();
+  const deadline = new Date(state.goalDeadline);
+  const diff = deadline - now;
+  const days = Math.max(0, Math.floor(diff / 86400000));
+  const monthsLeft = Math.max(0, Math.ceil(days / 30.44));
+  const neededPerMonth = remaining > 0 && monthsLeft > 0 ? remaining / monthsLeft : 0;
+
+  document.getElementById('goalCountdown').innerHTML = `
+    <div class="gc-item"><div class="gc-num">${monthsLeft}</div><div class="gc-label">Months Left</div></div>
+    <div class="gc-item"><div class="gc-num">${days}</div><div class="gc-label">Days Left</div></div>
+    <div class="gc-item"><div class="gc-num">${fmtShort(neededPerMonth)}</div><div class="gc-label">Need/Month</div></div>
+  `;
+
+  // Milestones
+  const dec2026 = 77778; // 70 lakhs
+  const dec2026High = 88889; // 80 lakhs
+  const sep2027 = target;
+  const dec2026Status = totalWorth >= dec2026 ? 'on-track' : (totalWorth >= dec2026 * 0.7 ? 'at-risk' : 'behind');
+  const sep2027Status = pct >= (monthsLeft <= 0 ? 100 : ((18 - monthsLeft) / 18) * 100 * 0.85) ? 'on-track' : 'at-risk';
+
+  document.getElementById('goalMilestones').innerHTML = `
+    <div class="milestone-card">
+      <div class="ms-icon">&#127937;</div>
+      <div class="ms-info">
+        <div class="ms-name">Dec 2026 — 70-80 Lakhs</div>
+        <div class="ms-detail">${fmtShort(dec2026)} - ${fmtShort(dec2026High)} target · You have ${fmtShort(totalWorth)}</div>
+      </div>
+      <span class="ms-status ${dec2026Status}">${dec2026Status === 'on-track' ? 'On Track' : dec2026Status === 'at-risk' ? 'Tight' : 'Behind'}</span>
+    </div>
+    <div class="milestone-card">
+      <div class="ms-icon">&#127942;</div>
+      <div class="ms-info">
+        <div class="ms-name">Sep 2027 — 1 Crore</div>
+        <div class="ms-detail">${fmtShort(sep2027)} target · ${pct.toFixed(1)}% done</div>
+      </div>
+      <span class="ms-status ${sep2027Status}">${sep2027Status === 'on-track' ? 'On Track' : 'Tight'}</span>
+    </div>
+  `;
+
+  // Assets
+  const stockProfit = state.assets.stocks - state.assets.stockInvested;
+  const stockProfitPct = state.assets.stockInvested > 0 ? ((stockProfit / state.assets.stockInvested) * 100).toFixed(1) : 0;
+  document.getElementById('goalAssetTotal').textContent = fmtShort(totalWorth);
+  document.getElementById('goalAssets').innerHTML = `
+    <div class="asset-card">
+      <div class="ac-left"><div class="ac-icon">&#128200;</div><div><div class="ac-name">Stocks ${stockProfit >= 0 ? '(+' + fmtShort(stockProfit) + ' / ' + stockProfitPct + '%)' : '(' + fmtShort(stockProfit) + ')'}</div><div class="ac-val">${fmtShort(state.assets.stocks)}</div></div></div>
+      <button class="ac-edit" onclick="editAsset('stocks')">Update</button>
+    </div>
+    <div class="asset-card">
+      <div class="ac-left"><div class="ac-icon">&#127974;</div><div><div class="ac-name">Bank Account</div><div class="ac-val">${fmtShort(state.assets.bank)}</div></div></div>
+      <button class="ac-edit" onclick="editAsset('bank')">Update</button>
+    </div>
+    <div class="asset-card">
+      <div class="ac-left"><div class="ac-icon">&#128176;</div><div><div class="ac-name">Cumulative Savings (auto)</div><div class="ac-val">${fmtShort(cumulative)}</div></div></div>
+      <span class="ac-auto">Auto-tracked</span>
+    </div>
+  `;
+
+  // Trips
+  const totalTravelBudget = state.trips.reduce((s,t) => s + t.budget, 0);
+  const totalTravelSpent = state.trips.reduce((s,t) => s + t.spent, 0);
+  document.getElementById('travelFundStatus').textContent = `${fmtShort(totalTravelSpent)} / ${fmtShort(totalTravelBudget)}`;
+  document.getElementById('travelFundStatus').style.color = totalTravelSpent > totalTravelBudget ? 'var(--red)' : 'var(--orange)';
+  document.getElementById('goalTrips').innerHTML = state.trips.map(trip => `
+    <div class="trip-card">
+      <div class="tr-icon">${trip.emoji}</div>
+      <div class="tr-info">
+        <div class="tr-name">${trip.name}</div>
+        <div class="tr-budget">Budget: ${fmtShort(trip.budget)} · Spent: ${fmtShort(trip.spent)}</div>
+      </div>
+      <button class="ac-edit" onclick="editTrip('${trip.id}')" style="font-size:11px;">Update</button>
+    </div>
+  `).join('');
+
+  // Projection
+  const avgMonthlySavings = months.length > 0 ? cumulative / months.length : state.monthlyIncome;
+  const projectedByDeadline = totalWorth + (avgMonthlySavings * monthsLeft);
+  const onTrack = projectedByDeadline >= target;
+  document.getElementById('goalProjection').innerHTML = `
+    <div class="proj-row"><span class="pr-label">Current Net Worth</span><span class="pr-value">${fmtShort(totalWorth)}</span></div>
+    <div class="proj-row"><span class="pr-label">Avg Monthly Savings</span><span class="pr-value">${fmtShort(avgMonthlySavings)}</span></div>
+    <div class="proj-row"><span class="pr-label">Months Remaining</span><span class="pr-value">${monthsLeft}</span></div>
+    <div class="proj-row"><span class="pr-label">Travel Deduction</span><span class="pr-value" style="color:var(--red);">-${fmtShort(totalTravelBudget - totalTravelSpent)}</span></div>
+    <div class="proj-row highlight">
+      <span class="pr-label">Projected by Sep 2027</span>
+      <span class="pr-value" style="color:${onTrack ? 'var(--green)' : 'var(--red)'};">${fmtShort(projectedByDeadline - (totalTravelBudget - totalTravelSpent))} ${onTrack ? '&#10003;' : '&#9888;'}</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center;">${onTrack ? 'You\'re on track! Keep it up.' : 'You need to save more or cut travel to hit the goal.'}</div>
+  `;
+
+  // Monthly savings log
+  const recentMonths = months.slice(-6).reverse();
+  document.getElementById('goalSavingsLog').innerHTML = recentMonths.length === 0
+    ? '<div class="no-data-msg">No data yet — savings will appear as months pass</div>'
+    : recentMonths.map(m => `
+      <div class="asset-card" style="margin-bottom:8px;">
+        <div class="ac-left"><div class="ac-icon">&#128197;</div><div><div class="ac-name">${m.label}</div><div class="ac-val" style="color:var(--green);">+${fmtShort(m.savings)}</div></div></div>
+        <div style="text-align:right;"><div style="font-size:11px;color:var(--text-dim);">Spent</div><div style="font-size:13px;color:var(--red);">${fmtShort(m.expenses)}</div></div>
+      </div>
+    `).join('');
+}
+
+function editAsset(type) {
+  if (type === 'stocks') {
+    const val = prompt('Current stock portfolio value ($):', state.assets.stocks);
+    if (val && !isNaN(val)) { state.assets.stocks = +val; saveData(); renderGoal(); showToast('Stocks updated'); }
+  } else if (type === 'bank') {
+    const val = prompt('Current bank balance ($):', state.assets.bank);
+    if (val && !isNaN(val)) { state.assets.bank = +val; saveData(); renderGoal(); showToast('Bank updated'); }
+  }
+}
+
+function editTrip(id) {
+  const trip = state.trips.find(t => t.id === id);
+  if (!trip) return;
+  const spent = prompt(`${trip.name} — Amount spent so far ($):`, trip.spent);
+  if (spent && !isNaN(spent)) { trip.spent = +spent; saveData(); renderGoal(); showToast('Trip updated'); }
+}
 
 loadData();
 render();
