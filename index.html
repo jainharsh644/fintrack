@@ -150,6 +150,12 @@
   .fixed-item.paid { border-color: var(--green); background: rgba(0,184,148,.06); }
   .fixed-item.paid .fi-status { color: var(--green); }
   .fixed-item.paid .fi-amt { color: var(--text-dim); }
+  /* Paycheck items - green theme for income */
+  .fixed-item.pay-pending { border-color: var(--accent-light); }
+  .fixed-item.pay-pending .fi-status { color: var(--accent-light); }
+  .fixed-item.pay-received { border-color: var(--green); background: rgba(0,184,148,.08); }
+  .fixed-item.pay-received .fi-status { color: var(--green); }
+  .fixed-item.pay-received .fi-amt { color: var(--green); }
   .fi-lock {
     position: absolute; top: 8px; right: 8px;
     width: 26px; height: 26px; border-radius: 50%;
@@ -496,13 +502,10 @@
     </div>
   </div>
 
-  <!-- Paycheck Info -->
-  <div class="paycheck-info" id="paycheckInfo">
-    <div>
-      <div class="pi-label">Next Paycheck</div>
-      <div class="pi-value" id="nextPaycheck">15th — $3,500</div>
-    </div>
-    <span class="pi-tag savings" id="paycheckTag">Savings</span>
+  <!-- Paychecks -->
+  <div class="fixed-section">
+    <h3>Paychecks <span id="paycheckStatus" style="color:var(--green);font-weight:600;"></span></h3>
+    <div class="fixed-grid" id="paycheckGrid"></div>
   </div>
 
   <div class="quick-add-bar" onclick="showPage('add')">
@@ -829,6 +832,10 @@ let state = {
     { id: 'chicago', name: 'Chicago', emoji: '🏙️', budget: 700, spent: 0 },
     { id: 'fourth', name: 'CA / NY', emoji: '🌉', budget: 900, spent: 0 },
   ],
+  paychecks: [
+    { id: 'salary_1', name: 'Salary 1 (15th)', amount: 3500, emoji: '💰', day: 15, purpose: 'Savings' },
+    { id: 'salary_2', name: 'Salary 2 (30th)', amount: 3500, emoji: '💰', day: 30, purpose: 'Expenses' },
+  ],
   monthlyIncome: 7000,
   goalTarget: 111111,
   goalDeadline: '2027-09-30',
@@ -851,8 +858,9 @@ function loadData() {
       state.monthlyIncome = p.monthlyIncome ?? 7000;
       state.goalTarget = p.goalTarget ?? 111111;
       state.goalDeadline = p.goalDeadline || '2027-09-30';
-      state.startMonth = p.startMonth ?? 4; // May 2026
+      state.startMonth = p.startMonth ?? 4;
       state.startYear = p.startYear ?? 2026;
+      state.paychecks = p.paychecks || state.paychecks;
     }
     // Migrate from v2
     const v2 = localStorage.getItem('spendwise_v2');
@@ -873,6 +881,7 @@ function saveData() {
     goalPin: state.goalPin, assets: state.assets, trips: state.trips,
     monthlyIncome: state.monthlyIncome, goalTarget: state.goalTarget,
     goalDeadline: state.goalDeadline, startMonth: state.startMonth, startYear: state.startYear,
+    paychecks: state.paychecks,
   }));
 }
 
@@ -947,6 +956,62 @@ function unlockFixedBill(e, billId) {
   showToast('Payment undone');
 }
 
+// ===== PAYCHECKS (tap to receive + lock) =====
+function isPaycheckReceived(paycheckId) {
+  const m = state.currentMonth, y = state.currentYear;
+  return state.transactions.some(t =>
+    t.paycheckId === paycheckId && t.isPaycheck && new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y
+  );
+}
+
+function receivePaycheck(paycheckId) {
+  if (isPaycheckReceived(paycheckId)) return;
+  const pc = state.paychecks.find(p => p.id === paycheckId);
+  if (!pc) return;
+  const m = state.currentMonth, y = state.currentYear;
+  const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(pc.day).padStart(2,'0')}`;
+  state.transactions.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    type: 'income', amount: pc.amount, category: 'salary',
+    note: pc.name + ' → ' + pc.purpose, date: dateStr,
+    createdAt: new Date().toISOString(),
+    paycheckId: pc.id, isPaycheck: true,
+  });
+  saveData();
+  render();
+  showToast(`${pc.emoji} ${pc.name} received! → ${pc.purpose}`);
+}
+
+function unlockPaycheck(e, paycheckId) {
+  e.stopPropagation();
+  if (!confirm('Undo this paycheck? It will be removed from income.')) return;
+  const m = state.currentMonth, y = state.currentYear;
+  state.transactions = state.transactions.filter(t =>
+    !(t.paycheckId === paycheckId && t.isPaycheck && new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y)
+  );
+  saveData();
+  render();
+  showToast('Paycheck undone');
+}
+
+function renderPaychecks(txs) {
+  const receivedCount = state.paychecks.filter(p => isPaycheckReceived(p.id)).length;
+  document.getElementById('paycheckStatus').textContent = `${receivedCount}/${state.paychecks.length} received`;
+  document.getElementById('paycheckGrid').innerHTML = state.paychecks.map(pc => {
+    const received = isPaycheckReceived(pc.id);
+    return `<div class="fixed-item ${received ? 'pay-received' : 'pay-pending'}" onclick="${received ? '' : `receivePaycheck('${pc.id}')`}">
+      <div class="fi-icon">${pc.emoji}</div>
+      <div class="fi-info">
+        <div class="fi-name">${pc.name}</div>
+        <div class="fi-amt">${fmt(pc.amount)}</div>
+        <div class="fi-status">${received ? '✓ Received & Locked' : 'Tap when received'}</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:1px;">→ ${pc.purpose}</div>
+      </div>
+      ${received ? `<button class="fi-lock unlocked" onclick="unlockPaycheck(event,'${pc.id}')" title="Undo">↩</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
 // ===== RENDER HOME =====
 function render() {
   const txs = getMonthTransactions();
@@ -972,19 +1037,8 @@ function render() {
   document.getElementById('savingsInfo').textContent = `of ${fmtShort(state.savingsGoal)} goal`;
   document.getElementById('savingsPct').textContent = Math.round(sPct) + '%';
 
-  // Next paycheck
-  const today = new Date();
-  const day = today.getDate();
-  let nextDay, nextPurpose;
-  if (day < 15) { nextDay = 15; nextPurpose = 'Savings'; }
-  else if (day < 30) { nextDay = 30; nextPurpose = 'Expenses'; }
-  else { nextDay = 15; nextPurpose = 'Savings'; }
-  document.getElementById('nextPaycheck').textContent = `${nextDay}th — $3,500`;
-  const tag = document.getElementById('paycheckTag');
-  tag.textContent = nextPurpose;
-  tag.className = 'pi-tag ' + (nextPurpose === 'Savings' ? 'savings' : 'expenses');
-
-  // Fixed bills status
+  // Paychecks & Fixed bills
+  renderPaychecks(txs);
   renderFixedBills(txs);
 
   // Budget = variable spending only (total budget - fixed bills that are paid)
