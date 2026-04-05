@@ -1065,7 +1065,7 @@ function unlockPaycheck(e, paycheckId) {
   if (!confirm('Undo this paycheck? It will be removed from income.')) return;
   const m = state.currentMonth, y = state.currentYear;
   state.transactions = state.transactions.filter(t =>
-    !(t.paycheckId === paycheckId && t.isPaycheck && new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y)
+    !(t.paycheckId === paycheckId && t.isPaycheck && new Date(t.date+'T12:00:00').getMonth() === m && new Date(t.date+'T12:00:00').getFullYear() === y)
   );
   saveData();
   render();
@@ -1228,7 +1228,7 @@ function renderChart(txs) {
 function txItemHTML(t) {
   const cats = CATEGORIES[t.type];
   const cat = cats.find(c => c.id === t.category) || { emoji: '📌', color: '#636e72', name: t.category };
-  const d = new Date(t.date);
+  const d = new Date(t.date+'T12:00:00');
   const dateStr = d.toLocaleDateString('en-US', { day:'numeric', month:'short' });
   return `<div class="tx-item" onclick="openEditModal('${t.id}')">
     <div class="tx-icon" style="background:${cat.color}22;color:${cat.color}">${cat.emoji}</div>
@@ -1264,7 +1264,7 @@ function renderFullTxList() {
   if (sorted.length === 0) { list.innerHTML = '<div class="no-data-msg">No transactions found</div>'; return; }
   let lastDate = '';
   list.innerHTML = sorted.map(t => {
-    const d = new Date(t.date);
+    const d = new Date(t.date+'T12:00:00');
     const dateStr = d.toLocaleDateString('en-US', {day:'numeric',month:'short'});
     const dayLabel = d.toLocaleDateString('en-US', {weekday:'short',day:'numeric',month:'short'});
     let header = '';
@@ -1378,7 +1378,7 @@ function renderBarChart() {
   for (let i = 5; i >= 0; i--) {
     let m = state.currentMonth - i, y = state.currentYear;
     if (m < 0) { m += 12; y--; }
-    const total = state.transactions.filter(t => { const d=new Date(t.date); return d.getMonth()===m && d.getFullYear()===y && t.type==='expense'; }).reduce((s,t)=>s+t.amount,0);
+    const total = state.transactions.filter(t => { const d=new Date(t.date+'T12:00:00'); return d.getMonth()===m && d.getFullYear()===y && t.type==='expense'; }).reduce((s,t)=>s+t.amount,0);
     months.push({ label: new Date(y,m).toLocaleDateString('en-US',{month:'short'}), value:total, isCurrent:i===0 });
   }
   barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
@@ -1391,7 +1391,7 @@ function renderLineChart(txs) {
   const expenses = txs.filter(t => t.type === 'expense');
   const daysInMonth = new Date(state.currentYear, state.currentMonth+1, 0).getDate();
   const daily = new Array(daysInMonth).fill(0);
-  expenses.forEach(t => { daily[new Date(t.date).getDate()-1] += t.amount; });
+  expenses.forEach(t => { daily[new Date(t.date+'T12:00:00').getDate()-1] += t.amount; });
   const cumulative = []; daily.reduce((acc,val,i) => { cumulative[i]=acc+val; return acc+val; }, 0);
   lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
     type:'line', data:{labels:daily.map((_,i)=>i+1),datasets:[{data:cumulative,borderColor:'#6c5ce7',backgroundColor:'rgba(108,92,231,.1)',fill:true,tension:.4,pointRadius:0,pointHitRadius:10,borderWidth:2}]},
@@ -1549,7 +1549,7 @@ function calcCumulativeSavings() {
   while (y < nowY || (y === nowY && m < nowM)) {
     // Only completed months (strictly before current month)
     const monthTxs = state.transactions.filter(t => {
-      const d = new Date(t.date); return d.getMonth() === m && d.getFullYear() === y;
+      const d = new Date(t.date+'T12:00:00'); return d.getMonth() === m && d.getFullYear() === y;
     });
     const expenses = monthTxs.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
     const monthSavings = Math.max(0, state.monthlyIncome - expenses);
@@ -1562,7 +1562,7 @@ function calcCumulativeSavings() {
 
   // Current month: show as "in progress" — not added to cumulative
   const curTxs = state.transactions.filter(t => {
-    const d = new Date(t.date); return d.getMonth() === nowM && d.getFullYear() === nowY;
+    const d = new Date(t.date+'T12:00:00'); return d.getMonth() === nowM && d.getFullYear() === nowY;
   });
   const curExpenses = curTxs.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
   const curProjected = Math.max(0, state.monthlyIncome - curExpenses);
