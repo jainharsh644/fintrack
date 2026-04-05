@@ -1096,9 +1096,9 @@ function render() {
   balEl.textContent = (balance >= 0 ? '' : '-') + fmtShort(balance);
   balEl.className = 'value ' + (balance >= 0 ? 'green' : 'red');
 
-  // Savings: 1st paycheck ($3500) + leftover from expense paycheck
-  const expensePaycheck = 3500;
-  const savingsFromPaycheck = 3500;
+  // Savings: 1st paycheck + leftover from expense paycheck (dynamic from paychecks)
+  const expensePaycheck = state.paychecks[1] ? state.paychecks[1].amount : 3057;
+  const savingsFromPaycheck = state.paychecks[0] ? state.paychecks[0].amount : 3022;
   const leftover = Math.max(0, expensePaycheck - expense);
   const totalSavings = savingsFromPaycheck + leftover;
   document.getElementById('savingsAmount').textContent = fmtShort(totalSavings);
