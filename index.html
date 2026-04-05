@@ -779,6 +779,12 @@
       <h3>Monthly Savings Log</h3>
       <div id="goalSavingsLog"></div>
     </div>
+
+    <!-- Adjust Numbers -->
+    <div class="goal-section">
+      <h3>Adjust Numbers</h3>
+      <div id="goalSettings"></div>
+    </div>
   </div>
 </div>
 
@@ -1686,6 +1692,68 @@ function renderGoal() {
         <div style="text-align:right;"><div style="font-size:11px;color:var(--text-dim);">Spent</div><div style="font-size:13px;color:var(--red);">${fmtShort(m.expenses)}</div></div>
       </div>
     `).join('');
+
+  // Adjust Numbers section
+  document.getElementById('goalSettings').innerHTML = `
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#127919;</div><div><div class="ac-name">Goal Target</div><div class="ac-val">${fmtShort(state.goalTarget)}</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('goalTarget')">Edit</button>
+    </div>
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#128197;</div><div><div class="ac-name">Goal Deadline</div><div class="ac-val">${state.goalDeadline}</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('goalDeadline')">Edit</button>
+    </div>
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#128176;</div><div><div class="ac-name">Monthly Income (both paychecks)</div><div class="ac-val">${fmtShort(state.monthlyIncome)}</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('monthlyIncome')">Edit</button>
+    </div>
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#128179;</div><div><div class="ac-name">Monthly Expense Budget</div><div class="ac-val">${fmtShort(state.budget)}</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('budget')">Edit</button>
+    </div>
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#127873;</div><div><div class="ac-name">Monthly Savings Goal</div><div class="ac-val">${fmtShort(state.savingsGoal)}</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('savingsGoal')">Edit</button>
+    </div>
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#128200;</div><div><div class="ac-name">Stock Invested (cost basis)</div><div class="ac-val">${fmtShort(state.assets.stockInvested)}</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('stockInvested')">Edit</button>
+    </div>
+    <div class="asset-card" style="margin-bottom:8px;">
+      <div class="ac-left"><div class="ac-icon">&#128274;</div><div><div class="ac-name">Change PIN</div><div class="ac-val" style="font-size:13px;">****</div></div></div>
+      <button class="ac-edit" onclick="editGoalSetting('pin')">Change</button>
+    </div>
+  `;
+}
+
+function editGoalSetting(key) {
+  if (key === 'goalTarget') {
+    const val = prompt('Goal target ($):', state.goalTarget);
+    if (val && !isNaN(val) && +val > 0) { state.goalTarget = +val; saveData(); renderGoal(); showToast('Goal updated'); }
+  } else if (key === 'goalDeadline') {
+    const val = prompt('Goal deadline (YYYY-MM-DD):', state.goalDeadline);
+    if (val && /^\d{4}-\d{2}-\d{2}$/.test(val)) { state.goalDeadline = val; saveData(); renderGoal(); showToast('Deadline updated'); }
+  } else if (key === 'monthlyIncome') {
+    const val = prompt('Total monthly income (both paychecks) ($):', state.monthlyIncome);
+    if (val && !isNaN(val) && +val > 0) { state.monthlyIncome = +val; saveData(); renderGoal(); showToast('Income updated'); }
+  } else if (key === 'budget') {
+    const val = prompt('Monthly expense budget ($):', state.budget);
+    if (val && !isNaN(val) && +val > 0) { state.budget = +val; saveData(); renderGoal(); showToast('Budget updated'); }
+  } else if (key === 'savingsGoal') {
+    const val = prompt('Monthly savings goal ($):', state.savingsGoal);
+    if (val && !isNaN(val) && +val > 0) { state.savingsGoal = +val; saveData(); renderGoal(); showToast('Savings goal updated'); }
+  } else if (key === 'stockInvested') {
+    const val = prompt('Stock invested / cost basis ($):', state.assets.stockInvested);
+    if (val && !isNaN(val) && +val >= 0) { state.assets.stockInvested = +val; saveData(); renderGoal(); showToast('Stock basis updated'); }
+  } else if (key === 'pin') {
+    const current = prompt('Enter current PIN:');
+    if (current !== state.goalPin) { showToast('Wrong PIN'); return; }
+    const newPin = prompt('Enter new 4-digit PIN:');
+    if (!newPin || newPin.length !== 4 || isNaN(newPin)) { showToast('PIN must be 4 digits'); return; }
+    state.goalPin = newPin;
+    saveData();
+    showToast('PIN changed!');
+  }
 }
 
 function addFulfillment(type) {
