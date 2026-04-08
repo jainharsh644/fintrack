@@ -780,6 +780,116 @@
       <div id="goalSavingsLog"></div>
     </div>
 
+    <!-- ====== GOLD TRACKER ====== -->
+    <div class="goal-section">
+      <h3 style="color:#fdcb6e;">Gold Biscuit Tracker <span id="goldTotalGrams" style="font-weight:600;"></span></h3>
+
+      <!-- Live Price + Calculator -->
+      <div style="background:linear-gradient(135deg,#3d2e0a,#1a1a24);border:1px solid rgba(253,203,110,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div>
+            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">24K Gold Price / Gram</div>
+            <div style="font-size:22px;font-weight:700;color:#fdcb6e;" id="goldPriceINR">Loading...</div>
+            <div style="font-size:11px;color:var(--text-dim);" id="goldPriceUSD"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">USD/INR Rate</div>
+            <div style="font-size:18px;font-weight:600;" id="usdInrRate">--</div>
+            <button onclick="fetchGoldPrice()" style="margin-top:4px;padding:4px 10px;border-radius:6px;border:1px solid rgba(253,203,110,.3);background:transparent;color:#fdcb6e;font-size:10px;cursor:pointer;">Refresh</button>
+          </div>
+        </div>
+
+        <!-- Quick Calculator -->
+        <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:6px;">QUICK CALCULATOR — I send $ how many grams?</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="flex:1;">
+              <input type="number" id="goldCalcUSD" placeholder="2000" inputmode="decimal" style="width:100%;padding:10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;outline:none;" oninput="calcGold()">
+              <div style="font-size:10px;color:var(--text-dim);margin-top:2px;">USD you send</div>
+            </div>
+            <div style="color:var(--text-dim);">→</div>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:#fdcb6e;" id="goldCalcINR">₹0</div>
+              <div style="font-size:10px;color:var(--text-dim);">INR received</div>
+            </div>
+            <div style="color:var(--text-dim);">→</div>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:var(--green);" id="goldCalcGrams">0g</div>
+              <div style="font-size:10px;color:var(--text-dim);">24K gold</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual price override -->
+        <div style="display:flex;gap:6px;">
+          <button onclick="manualGoldPrice()" style="flex:1;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text-dim);font-size:10px;cursor:pointer;">Set Price Manually</button>
+          <button onclick="manualRate()" style="flex:1;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text-dim);font-size:10px;cursor:pointer;">Set USD/INR Rate</button>
+        </div>
+      </div>
+
+      <!-- Goal Progress: 700g -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;">Progress: <b id="goldOwned">0g</b> / <b id="goldGoal">700g</b></span>
+          <span style="font-size:13px;color:#fdcb6e;font-weight:600;" id="goldPctText">0%</span>
+        </div>
+        <div style="height:10px;background:var(--bg);border-radius:5px;overflow:hidden;">
+          <div id="goldBar" style="height:100%;background:linear-gradient(90deg,#fdcb6e,#f39c12);border-radius:5px;width:0%;transition:width .5s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-dim);">
+          <span id="goldRemaining">700g to go</span>
+          <span id="goldETA">ETA: --</span>
+        </div>
+      </div>
+
+      <!-- Monthly Target -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div class="stat-card"><div class="label">Monthly Target</div><div class="value" style="color:#fdcb6e;font-size:15px;" id="goldMonthlyTarget">--</div></div>
+        <div class="stat-card"><div class="label">Months Left</div><div class="value" style="font-size:15px;" id="goldMonthsLeft">--</div></div>
+        <div class="stat-card"><div class="label">Need/Month</div><div class="value" style="color:#fdcb6e;font-size:15px;" id="goldPerMonth">--</div></div>
+      </div>
+
+      <!-- Purchase Log -->
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;display:flex;justify-content:space-between;">
+        <span>Purchase Log</span>
+        <span id="goldTotalSpent" style="color:#fdcb6e;"></span>
+      </div>
+      <div id="goldPurchases"></div>
+      <button class="submit-btn" style="margin-top:8px;font-size:13px;padding:12px;background:#f39c12;" onclick="addGoldPurchase()">+ Log Gold Biscuit Purchase</button>
+    </div>
+
+    <!-- ====== DEBT TRACKER ====== -->
+    <div class="goal-section">
+      <h3 style="color:var(--red);">Debt Clearance — 50 Lakhs <span id="debtStatus" style="font-weight:600;"></span></h3>
+
+      <!-- Debt Progress -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;">Cleared: <b id="debtPaid">$0</b></span>
+          <span style="font-size:13px;color:var(--red);">Remaining: <b id="debtRemaining">$55,556</b></span>
+        </div>
+        <div style="height:10px;background:var(--bg);border-radius:5px;overflow:hidden;">
+          <div id="debtBar" style="height:100%;background:linear-gradient(90deg,var(--green),#10b981);border-radius:5px;width:0%;transition:width .5s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-dim);">
+          <span id="debtPctText">0% cleared</span>
+          <span>Target: Dec 2027 / Jan 2028</span>
+        </div>
+      </div>
+
+      <!-- Debt Strategy -->
+      <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--text-dim);">
+        <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Strategy: Gold First, Debt After</div>
+        <div>• Priority 1: Accumulate 700g gold by Dec 2027</div>
+        <div>• Priority 2: Clear 50L debt by Dec 2027 / Jan 2028</div>
+        <div>• Debt payments from: stock profits, options gains, surplus savings</div>
+      </div>
+
+      <!-- Debt Payment Log -->
+      <div id="debtPayments"></div>
+      <button class="submit-btn" style="margin-top:8px;font-size:13px;padding:12px;background:var(--red);" onclick="addDebtPayment()">+ Log Debt Payment</button>
+    </div>
+
     <!-- Adjust Numbers -->
     <div class="goal-section">
       <h3>Adjust Numbers</h3>
@@ -883,7 +993,16 @@ let state = {
     { id: 'salary_1', name: 'Salary 1 (15th)', amount: 3500, emoji: '💰', day: 15, purpose: 'Savings' },
     { id: 'salary_2', name: 'Salary 2 (30th)', amount: 3500, emoji: '💰', day: 30, purpose: 'Expenses' },
   ],
-  fulfillments: [], // { id, type: 'debt'|'gold', amount, note, date }
+  fulfillments: [],
+  goldPurchases: [], // { id, grams, pricePerGram, totalINR, totalUSD, date, note }
+  goldGoal: 700,
+  goldDeadline: '2027-12-31',
+  goldPricePerGram: 13500, // INR
+  usdInrRate: 90,
+  debtTotal: 555556, // 50 lakhs INR in USD = ~$55,556
+  debtTotalINR: 5000000,
+  debtPayments: [], // { id, amount, amountINR, date, note }
+  debtDeadline: '2028-01-31',
   monthlyIncome: 7000,
   goalTarget: 111111,
   goalDeadline: '2027-10-31',
@@ -910,6 +1029,15 @@ function loadData() {
       state.startYear = p.startYear ?? 2026;
       state.paychecks = p.paychecks || state.paychecks;
       state.fulfillments = p.fulfillments || [];
+      state.goldPurchases = p.goldPurchases || [];
+      state.goldGoal = p.goldGoal ?? 700;
+      state.goldDeadline = p.goldDeadline || '2027-12-31';
+      state.goldPricePerGram = p.goldPricePerGram ?? 13500;
+      state.usdInrRate = p.usdInrRate ?? 90;
+      state.debtTotal = p.debtTotal ?? 555556;
+      state.debtTotalINR = p.debtTotalINR ?? 5000000;
+      state.debtPayments = p.debtPayments || [];
+      state.debtDeadline = p.debtDeadline || '2028-01-31';
     }
     // Migrate from v2
     const v2 = localStorage.getItem('spendwise_v2');
@@ -931,6 +1059,11 @@ function saveData() {
     monthlyIncome: state.monthlyIncome, goalTarget: state.goalTarget,
     goalDeadline: state.goalDeadline, startMonth: state.startMonth, startYear: state.startYear,
     paychecks: state.paychecks, fulfillments: state.fulfillments,
+    goldPurchases: state.goldPurchases, goldGoal: state.goldGoal,
+    goldDeadline: state.goldDeadline, goldPricePerGram: state.goldPricePerGram,
+    usdInrRate: state.usdInrRate, debtTotal: state.debtTotal,
+    debtTotalINR: state.debtTotalINR, debtPayments: state.debtPayments,
+    debtDeadline: state.debtDeadline,
   }));
 }
 
@@ -1819,6 +1952,190 @@ function editTrip(id) {
   const spent = prompt(`${trip.name} — Amount spent so far ($):`, trip.spent);
   if (spent && !isNaN(spent)) { trip.spent = +spent; saveData(); renderGoal(); showToast('Trip updated'); }
 }
+
+// ===== GOLD TRACKER =====
+async function fetchGoldPrice() {
+  try {
+    // Fetch USD/INR rate
+    const rateRes = await fetch('https://open.er-api.com/v6/latest/USD');
+    const rateData = await rateRes.json();
+    if (rateData.rates && rateData.rates.INR) {
+      state.usdInrRate = Math.round(rateData.rates.INR * 100) / 100;
+    }
+    // Gold price: use approximate from oz price / 31.1
+    // Free gold API
+    try {
+      const goldRes = await fetch('https://api.metalpriceapi.com/v1/latest?api_key=demo&base=USD&currencies=XAU');
+      const goldData = await goldRes.json();
+      if (goldData.rates && goldData.rates.USDXAU) {
+        const perOzUSD = 1 / goldData.rates.USDXAU;
+        const perGramUSD = perOzUSD / 31.1035;
+        state.goldPricePerGram = Math.round(perGramUSD * state.usdInrRate);
+      }
+    } catch(e) { /* use manual price */ }
+    saveData();
+    renderGold();
+    showToast('Prices updated');
+  } catch(e) {
+    showToast('Could not fetch — update manually');
+  }
+}
+
+function manualGoldPrice() {
+  const v = prompt('24K Gold price per gram (INR):', state.goldPricePerGram);
+  if (v && !isNaN(v) && +v > 0) { state.goldPricePerGram = +v; saveData(); renderGold(); showToast('Gold price updated'); }
+}
+
+function manualRate() {
+  const v = prompt('USD to INR rate:', state.usdInrRate);
+  if (v && !isNaN(v) && +v > 0) { state.usdInrRate = +v; saveData(); renderGold(); showToast('Rate updated'); }
+}
+
+function calcGold() {
+  const usd = parseFloat(document.getElementById('goldCalcUSD').value) || 0;
+  const inr = usd * state.usdInrRate;
+  const grams = inr / state.goldPricePerGram;
+  document.getElementById('goldCalcINR').textContent = '₹' + Math.round(inr).toLocaleString('en-IN');
+  document.getElementById('goldCalcGrams').textContent = grams.toFixed(1) + 'g';
+}
+
+function renderGold() {
+  const totalGrams = state.goldPurchases.reduce((s, p) => s + p.grams, 0);
+  const totalSpentUSD = state.goldPurchases.reduce((s, p) => s + (p.totalUSD || 0), 0);
+  const totalSpentINR = state.goldPurchases.reduce((s, p) => s + (p.totalINR || 0), 0);
+  const goal = state.goldGoal;
+  const pct = Math.min((totalGrams / goal) * 100, 100);
+  const remaining = Math.max(0, goal - totalGrams);
+
+  // Price display
+  document.getElementById('goldPriceINR').textContent = '₹' + state.goldPricePerGram.toLocaleString('en-IN') + '/g';
+  document.getElementById('goldPriceUSD').textContent = '$' + (state.goldPricePerGram / state.usdInrRate).toFixed(2) + '/g · 1 USD = ₹' + state.usdInrRate;
+
+  // Progress
+  document.getElementById('goldTotalGrams').textContent = totalGrams.toFixed(1) + 'g / ' + goal + 'g';
+  document.getElementById('goldOwned').textContent = totalGrams.toFixed(1) + 'g';
+  document.getElementById('goldGoal').textContent = goal + 'g';
+  document.getElementById('goldPctText').textContent = pct.toFixed(1) + '%';
+  document.getElementById('goldBar').style.width = pct + '%';
+  document.getElementById('goldRemaining').textContent = remaining.toFixed(1) + 'g to go';
+
+  // ETA
+  const now = new Date();
+  const deadline = new Date(state.goldDeadline + 'T12:00:00');
+  const monthsLeft = Math.max(0, Math.ceil((deadline - now) / (30.44 * 86400000)));
+  const gramsPerMonth = remaining > 0 && monthsLeft > 0 ? remaining / monthsLeft : 0;
+  const usdPerMonth = (gramsPerMonth * state.goldPricePerGram) / state.usdInrRate;
+
+  document.getElementById('goldMonthsLeft').textContent = monthsLeft;
+  document.getElementById('goldPerMonth').textContent = gramsPerMonth.toFixed(1) + 'g';
+  document.getElementById('goldMonthlyTarget').textContent = fmtShort(usdPerMonth);
+  document.getElementById('goldETA').textContent = monthsLeft > 0 ? `${monthsLeft} months left` : 'Deadline passed';
+
+  // Total spent
+  document.getElementById('goldTotalSpent').textContent = 'Total: ' + fmtShort(totalSpentUSD) + ' (₹' + Math.round(totalSpentINR).toLocaleString('en-IN') + ')';
+
+  // Purchase log
+  const sorted = [...state.goldPurchases].sort((a, b) => new Date(b.date) - new Date(a.date));
+  document.getElementById('goldPurchases').innerHTML = sorted.length === 0
+    ? '<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:12px;">No purchases yet. Buy your first biscuit!</div>'
+    : sorted.map(p => {
+      const d = new Date(p.date + 'T12:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+        <div style="font-size:20px;">🪙</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#fdcb6e;">${p.grams}g biscuit</div>
+          <div style="font-size:11px;color:var(--text-dim);">${d} · ₹${Math.round(p.totalINR).toLocaleString('en-IN')} ($${Math.round(p.totalUSD)})</div>
+          ${p.note ? `<div style="font-size:11px;color:var(--text-dim);">${p.note}</div>` : ''}
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text-dim);">₹${Math.round(p.pricePerGram).toLocaleString('en-IN')}/g</div>
+        </div>
+        <button onclick="deleteGoldPurchase('${p.id}')" style="width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>`;
+    }).join('');
+}
+
+function addGoldPurchase() {
+  const grams = prompt('Grams purchased (e.g. 10, 50, 100):');
+  if (!grams || isNaN(grams) || +grams <= 0) return;
+  const pricePerGram = prompt('Price per gram paid (INR):', state.goldPricePerGram);
+  if (!pricePerGram || isNaN(pricePerGram)) return;
+  const totalINR = +grams * +pricePerGram;
+  const totalUSD = totalINR / state.usdInrRate;
+  const note = prompt('Note (e.g. "MMTC-PAMP 10g bar from SBI"):') || '';
+  state.goldPurchases.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    grams: +grams, pricePerGram: +pricePerGram,
+    totalINR, totalUSD,
+    date: new Date().toISOString().split('T')[0],
+    note,
+  });
+  saveData(); renderGold();
+  showToast(`🪙 ${grams}g gold biscuit logged!`);
+}
+
+function deleteGoldPurchase(id) {
+  if (!confirm('Delete this purchase?')) return;
+  state.goldPurchases = state.goldPurchases.filter(p => p.id !== id);
+  saveData(); renderGold(); showToast('Removed');
+}
+
+// ===== DEBT TRACKER =====
+function renderDebt() {
+  const totalPaid = state.debtPayments.reduce((s, p) => s + p.amount, 0);
+  const totalPaidINR = state.debtPayments.reduce((s, p) => s + (p.amountINR || p.amount * state.usdInrRate), 0);
+  const remaining = Math.max(0, state.debtTotal - totalPaid);
+  const remainingINR = Math.max(0, state.debtTotalINR - totalPaidINR);
+  const pct = Math.min((totalPaid / state.debtTotal) * 100, 100);
+
+  document.getElementById('debtStatus').textContent = fmtShort(totalPaid) + ' / ' + fmtShort(state.debtTotal);
+  document.getElementById('debtPaid').textContent = fmtShort(totalPaid) + ' (₹' + Math.round(totalPaidINR).toLocaleString('en-IN') + ')';
+  document.getElementById('debtRemaining').textContent = fmtShort(remaining) + ' (₹' + Math.round(remainingINR).toLocaleString('en-IN') + ')';
+  document.getElementById('debtBar').style.width = pct + '%';
+  document.getElementById('debtPctText').textContent = pct.toFixed(1) + '% cleared';
+
+  const sorted = [...state.debtPayments].sort((a, b) => new Date(b.date) - new Date(a.date));
+  document.getElementById('debtPayments').innerHTML = sorted.length === 0
+    ? '<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:12px;">No debt payments yet.</div>'
+    : sorted.map(p => {
+      const d = new Date(p.date + 'T12:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+        <div style="font-size:20px;">💸</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--green);">${fmtShort(p.amount)} paid</div>
+          <div style="font-size:11px;color:var(--text-dim);">${d} · ₹${Math.round(p.amountINR || p.amount * state.usdInrRate).toLocaleString('en-IN')}</div>
+          ${p.note ? `<div style="font-size:11px;color:var(--text-dim);">${p.note}</div>` : ''}
+        </div>
+        <button onclick="deleteDebtPayment('${p.id}')" style="width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>`;
+    }).join('');
+}
+
+function addDebtPayment() {
+  const amount = prompt('Debt payment amount ($):');
+  if (!amount || isNaN(amount) || +amount <= 0) return;
+  const amountINR = +amount * state.usdInrRate;
+  const note = prompt('Note (e.g. "Sent to dad via Wise"):') || '';
+  state.debtPayments.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    amount: +amount, amountINR,
+    date: new Date().toISOString().split('T')[0],
+    note,
+  });
+  saveData(); renderDebt();
+  showToast(`💸 ${fmtShort(+amount)} debt payment logged`);
+}
+
+function deleteDebtPayment(id) {
+  if (!confirm('Delete this payment?')) return;
+  state.debtPayments = state.debtPayments.filter(p => p.id !== id);
+  saveData(); renderDebt(); showToast('Removed');
+}
+
+// Add gold + debt rendering to renderGoal
+const _origRenderGoal = renderGoal;
+const origRenderGoal = function() { _origRenderGoal(); renderGold(); renderDebt(); };
+renderGoal = origRenderGoal;
 
 loadData();
 render();
